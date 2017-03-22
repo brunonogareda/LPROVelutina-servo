@@ -1,9 +1,10 @@
 from RPIO import PWM    #importamos a libreria para PWM
+from subprocess import call #Importamos para a interrupcion de teclado
 import time
 import sys
 
-pin_servo1 = 2
-pin_servo2 = 3
+GPIO_SERVO1 = 2
+GPIO_SERVO2 = 3
 
 #Esta funcion calcula o tempo de activacion do pulso en us en funcion do angulo que se lle pasa.
 def angleToTime(angulo):
@@ -26,16 +27,23 @@ print 'Pulso1: '+ repr(pulso1) +', Pulso2: '+ repr(pulso2)
 servo=PWM.Servo()                               #Iniciamos a libreria para o servo
 
 
-servo.set_servo(pin_servo2,1500)
-servo.set_servo(pin_servo1,1500)                #Centramos o servo
+servo.set_servo(GPIO_SERVO2,1500)
+servo.set_servo(GPIO_SERVO1,1500)                #Centramos o servo
 time.sleep(1)
-for _i in range(50):
-    servo.set_servo(pin_servo1,590)
-    servo.set_servo(pin_servo2,590)
-    time.sleep(1)
-    servo.set_servo(pin_servo1,2200)
-    servo.set_servo(pin_servo2,2200)
-    time.sleep(1)
+while True:
+    try:
+        servo.set_servo(GPIO_SERVO1,590)
+        servo.set_servo(GPIO_SERVO2,590)
+        time.sleep(1)
+        servo.set_servo(GPIO_SERVO1,2200)
+        servo.set_servo(GPIO_SERVO2,2200)
+        time.sleep(1)
+    except KeyboardInterrupt:
+        break
 
-servo.stop_servo(pin_servo1)
-servo.stop_servo(pin_servo2)
+servo.set_servo(GPIO_SERVO2,1500)
+servo.set_servo(GPIO_SERVO1,1500)
+time.sleep(0.5)
+
+#por ultimo hay que restablecer los pines GPIO
+print "Acabado"
