@@ -31,8 +31,8 @@ pwm2 = GPIO.PWM(GPIO_SERVO2, 100)
 pwm1.start(5)
 pwm2.start(5)
 
-updateServo(pw1, angle1)
-updateServo(pw2, angle2)
+updateServo(pwm1, angle1)
+updateServo(pwm2, angle2)
 time.sleep(1)
 print "Pulse [Enter] para terminar."
 s = sys.stdin.read(1)
