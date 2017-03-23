@@ -8,7 +8,7 @@ GPIO_SERVO_X = 2
 GPIO_SERVO_Y = 3
 
 VIDEO_RESOLUTION_X = 1280
-VIDEO_RESULUTION_Y = 720
+VIDEO_RESOLUTION_Y = 720
 
 VIDEO_ANGLE_X = 40
 VIDEO_ANGLE_Y = 40
@@ -27,7 +27,7 @@ def updateServo(pwm, angle):
 
 def coordToAngle(x,y):
 	CENTER_X = VIDEO_RESOLUTION_X/2
-	CENTER_Y = VIDEO_RESULUTION_Y/2
+	CENTER_Y = VIDEO_RESOLUTION_Y/2
 	coordX = float(x-CENTER_X)
 	coordY = float(CENTER_Y-y)
 	return (coordX/float(CENTER_X))*VIDEO_ANGLE_X, (coordY/float(CENTER_Y))*VIDEO_ANGLE_Y
@@ -39,12 +39,19 @@ if len(sys.argv)>2:
 	coordX = int(sys.argv[1])
 	coordY = int(sys.argv[2])
 
+coordX = coordX if coordX>0 else 0
+coordY = coordY if coordY>0 else 0
+coordX = coordX if coordX<VIDEO_RESOLUTION_X else VIDEO_RESOLUTION_X
+coordY = coordY if coordY<VIDEO_RESOLUTION_Y else VIDEO_RESOLUTION_Y
+
 # pwm_X = GPIO.PWM(GPIO_SERVO_X, 100)
 # pwm_Y = GPIO.PWM(GPIO_SERVO_Y, 100)
 # pwm_X.start(5)
 # pwm_Y.start(5)
 
-angleX, angleY= normalizeAndCenter(coordX, coordY)
+angleX, angleY = coordToAngle(coordX, coordY)
+angleX = 90 - angleX
+angleY = 90 - angleY
 print angleX," - ", angleY
 exit(1)
 
