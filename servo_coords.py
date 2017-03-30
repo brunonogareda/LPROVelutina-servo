@@ -1,6 +1,8 @@
-# from RPIO import PWM	#importamos a libreria para PWM
+from RPIO import PWM	#importamos a libreria para PWM
 import time
 import sys
+import os
+import errno
 
 SERVO_ERR = 3
 
@@ -13,11 +15,13 @@ VIDEO_RESOLUTION_Y = 720
 VIDEO_ANGLE_X = 40
 VIDEO_ANGLE_Y = 40
 
-# GPIO.setmode(GPIO.BCM)
-# GPIO.setwarnings(False)
-#
-# GPIO.setup(GPIO_SERVO_X, GPIO.OUT)
-# GPIO.setup(GPIO_SERVO_Y, GPIO.OUT)
+FIFO = '/tmp/coordenadas'
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
+
+GPIO.setup(GPIO_SERVO_X, GPIO.OUT)
+GPIO.setup(GPIO_SERVO_Y, GPIO.OUT)
 
 def updateServo(pwm, angle):
 	if angle<0 or angle>180:
@@ -32,32 +36,60 @@ def coordToAngle(x,y):
 	coordY = float(CENTER_Y-y)
 	return (coordX/float(CENTER_X))*VIDEO_ANGLE_X, (coordY/float(CENTER_Y))*VIDEO_ANGLE_Y
 
+def receiveCoords():
+	try:
+	    os.mkfifo(FIFO)
+	except OSError as oe:
+	    if oe.errno != errno.EEXIST:
+	        raise
+	with open(FIFO) as fifo:
+		time.sleep(.1)
+		data = fifo.read()
+		if len(data) == 0:
+			return -1, -1
+		Sx = data.split('-')[0]
+		Sy = data.split('-')[1]
+		x = Sx.split(':', 1)[1]
+		y = Sy.split(':', 1)[1]
+		return int(x), int(y)
+
+
 #Miramos se existe un argumento de entrada utilizamolo como angulo
 coordX = 0
 coordY = 0
-if len(sys.argv)>2:
-	coordX = int(sys.argv[1])
-	coordY = int(sys.argv[2])
+# if len(sys.argv)>2:
+# 	coordX = int(sys.argv[1])
+# 	coordY = int(sys.argv[2])
 
-coordX = coordX if coordX>0 else 0
-coordY = coordY if coordY>0 else 0
-coordX = coordX if coordX<VIDEO_RESOLUTION_X else VIDEO_RESOLUTION_X
-coordY = coordY if coordY<VIDEO_RESOLUTION_Y else VIDEO_RESOLUTION_Y
+while True:
 
-# pwm_X = GPIO.PWM(GPIO_SERVO_X, 100)
-# pwm_Y = GPIO.PWM(GPIO_SERVO_Y, 100)
-# pwm_X.start(5)
-# pwm_Y.start(5)
+	try:
 
-angleX, angleY = coordToAngle(coordX, coordY)
-angleX = 90 - angleX
-angleY = 90 - angleY
-print angleX," - ", angleY
-exit(1)
+		coordX, coordY = receiveCoords()
 
-updateServo(pwm_X, angleX)
-updateServo(pwm_Y, angleY)
-time.sleep(1)
+		coordX = coordX if coordX>0 else 0
+		coordY = coordY if coordY>0 else 0
+		coordX = coordX if coordX<VIDEO_RESOLUTION_X else VIDEO_RESOLUTION_X
+		coordY = coordY if coordY<VIDEO_RESOLUTION_Y else VIDEO_RESOLUTION_Y
+
+		pwm_X = GPIO.PWM(GPIO_SERVO_X, 100)
+		pwm_Y = GPIO.PWM(GPIO_SERVO_Y, 100)
+		pwm_X.start(5)
+		pwm_Y.start(5)
+
+		angleX, angleY = coordToAngle(coordX, coordY)
+		angleX = 90 - angleX
+		angleY = 90 - angleY
+		print angleX," - ", angleY
+		continue
+
+		updateServo(pwm_X, angleX)
+		updateServo(pwm_Y, angleY)
+		time.sleep(1)
+
+	except KeyboardInterrupt:
+            break
+
 print "Pulse [Enter] para terminar."
 s = sys.stdin.read(1)
 
