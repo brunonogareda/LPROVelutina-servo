@@ -1,4 +1,4 @@
-from RPIO import PWM	#importamos a libreria para PWM
+import RPi.GPIO as GPIO
 import time
 import sys
 import os
@@ -8,6 +8,7 @@ SERVO_ERR = 3
 
 GPIO_SERVO_X = 2
 GPIO_SERVO_Y = 3
+GPIO_LED = 4
 
 VIDEO_RESOLUTION_X = 1280
 VIDEO_RESOLUTION_Y = 720
@@ -22,6 +23,7 @@ GPIO.setwarnings(False)
 
 GPIO.setup(GPIO_SERVO_X, GPIO.OUT)
 GPIO.setup(GPIO_SERVO_Y, GPIO.OUT)
+GPIO.setup(GPIO_LED, GPIO.OUT)
 
 def updateServo(pwm, angle):
 	if angle<0 or angle>180:
@@ -61,6 +63,15 @@ coordY = 0
 # 	coordX = int(sys.argv[1])
 # 	coordY = int(sys.argv[2])
 
+pwm_X = GPIO.PWM(GPIO_SERVO_X, 100)
+pwm_Y = GPIO.PWM(GPIO_SERVO_Y, 100)
+pwm_X.start(1)
+pwm_Y.start(1)
+
+updateServo(pwm_X, 90)
+updateServo(pwm_Y, 90)
+time.sleep(0.5)
+
 while True:
 
 	try:
@@ -72,20 +83,20 @@ while True:
 		coordX = coordX if coordX<VIDEO_RESOLUTION_X else VIDEO_RESOLUTION_X
 		coordY = coordY if coordY<VIDEO_RESOLUTION_Y else VIDEO_RESOLUTION_Y
 
-		pwm_X = GPIO.PWM(GPIO_SERVO_X, 100)
-		pwm_Y = GPIO.PWM(GPIO_SERVO_Y, 100)
-		pwm_X.start(5)
-		pwm_Y.start(5)
-
 		angleX, angleY = coordToAngle(coordX, coordY)
 		angleX = 90 - angleX
 		angleY = 90 - angleY
 		print angleX," - ", angleY
-		continue
 
 		updateServo(pwm_X, angleX)
 		updateServo(pwm_Y, angleY)
+
+        GPIO.output(GPIO_LED, GPIO.HIGH)
+
 		time.sleep(1)
+
+		GPIO.output(GPIO_LED, GPIO.LOW)
+
 
 	except KeyboardInterrupt:
             break
@@ -96,5 +107,3 @@ s = sys.stdin.read(1)
 updateServo(pwm_X, 90)
 updateServo(pwm_Y, 90)
 time.sleep(.5)
-pwm1.stop()
-pwm2.stop()
