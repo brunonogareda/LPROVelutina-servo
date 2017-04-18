@@ -6,6 +6,8 @@ import errno
 import math
 
 SERVO_ERR = 3
+SERVO_ERR_ANGLE_X = -9
+SERVO_ERR_ANGLE_Y = -21
 
 GPIO_SERVO_X = 2
 GPIO_SERVO_Y = 3
@@ -62,6 +64,7 @@ def coordToAngle(x,y):
 
     angleX = 90-angleX if (PosX >= desp_x) else 90+angleX
     #angleY = 90-angleY if (PosY >= desp_y) else 90+angleY
+    angleX = 90-angleX
 
     angleY = (coordY/float(CENTER_Y))*VIDEO_ANGLE_Y
 
@@ -102,9 +105,8 @@ pwm_Y = GPIO.PWM(GPIO_SERVO_Y, 100)
 pwm_X.start(1)
 pwm_Y.start(1)
 
-updateServo(pwm_X, 90-9)
-updateServo(pwm_Y, 90)
-time.sleep(0.5)
+updateServo(pwm_X, 90+SERVO_ERR_ANGLE_X)
+updateServo(pwm_Y, 90+SERVO_ERR_ANGLE_Y)
 pwm_X.ChangeDutyCycle(0);
 pwm_Y.ChangeDutyCycle(0);
 
@@ -126,8 +128,8 @@ while True:
         angleY = 90 - angleY
         print angleX," - ", angleY
 
-        updateServo(pwm_X, angleX-9)
-        updateServo(pwm_Y, angleY)
+        updateServo(pwm_X, angleX+SERVO_ERR_ANGLE_X)
+        updateServo(pwm_Y, angleY+SERVO_ERR_ANGLE_Y)
 
         time.sleep(0.5)
 
@@ -145,6 +147,6 @@ while True:
 print "Pulse [Enter] para terminar."
 s = sys.stdin.read(1)
 
-updateServo(pwm_X, 90-9)
-updateServo(pwm_Y, 90)
+updateServo(pwm_X, 90+SERVO_ERR_ANGLE_X)
+updateServo(pwm_Y, 90+SERVO_ERR_ANGLE_Y)
 time.sleep(.5)
