@@ -16,14 +16,15 @@ GPIO_LED = 4
 VIDEO_RESOLUTION_X = 640 #1280
 VIDEO_RESOLUTION_Y = 480 #720
 
-VIDEO_ANGLE_X = 52.46 #35
-VIDEO_ANGLE_Y = 30
+VIDEO_ANGLE_X = 62 #35
+VIDEO_ANGLE_Y = 47.5 #30
 
 AVERAGE_DEPTH_X = 73
 AVERAGE_DEPTH_Y = 73
 
-DEPTH_SIZE_X = math.tan(math.radians(VIDEO_ANGLE_X))*AVERAGE_DEPTH_X #95
-DEPTH_SIZE_Y = 95
+# FOV = 2*D*tan(Angulo/2)
+DEPTH_SIZE_X = 2*AVERAGE_DEPTH_X*math.tan(math.radians(VIDEO_ANGLE_X)/2) #95
+DEPTH_SIZE_Y = 87 #95
 
 CAMERA_SEPARATION_X = 15
 CAMERA_SEPARATION_Y = 0
@@ -54,23 +55,24 @@ def coordToAngle(x,y):
     y = float(y)
 
     PosX = (x/VIDEO_RESOLUTION_X)*DEPTH_SIZE_X
-    #PosY = (y/VIDEO_RESOLUTION_Y)*DEPTH_SIZE_Y
+    PosY = (y/VIDEO_RESOLUTION_Y)*DEPTH_SIZE_Y
 
     desp_x = (float(DEPTH_SIZE_X)/2)-CAMERA_SEPARATION_X
-    #desp_y = (DEPTH_SIZE_Y/2)-CAMERA_SEPARATION_Y
+    desp_y = (DEPTH_SIZE_Y/2)-CAMERA_SEPARATION_Y
 
     angleX = math.degrees(math.atan(abs(PosX-desp_x)/AVERAGE_DEPTH_X))
-    #angleY = math.degrees(math.atan(abs(PosY-desp_y)/AVERAGE_DEPTH_Y))
+    angleY = math.degrees(math.atan(abs(PosY-desp_y)/AVERAGE_DEPTH_Y))
 
     angleX = 90-angleX if (PosX >= desp_x) else 90+angleX
-    #angleY = 90-angleY if (PosY >= desp_y) else 90+angleY
-    angleX = 90-angleX
+    angleY = 90-angleY if (PosY >= desp_y) else 90+angleY
 
-    angleY = (coordY/float(CENTER_Y))*VIDEO_ANGLE_Y
+    angleX = 90-angleX
+    angleY = 90-angleY
+
+    #angleY = (coordY/float(CENTER_Y))*VIDEO_ANGLE_Y
 
     return angleX, angleY
 
-    #return (coordX/float(CENTER_X))*VIDEO_ANGLE_X, (coordY/float(CENTER_Y))*VIDEO_ANGLE_Y
 
 def receiveCoords():
 	try:
