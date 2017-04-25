@@ -84,12 +84,14 @@ def receiveCoords():
 	    time.sleep(.1)
 	    data = fifo.read()
 	    if len(data) == 0:
-		return -1, -1
-            Sx = data.split('-')[0]
+            return -1, -1
+        Sx = data.split('-')[0]
 	    Sy = data.split('-')[1]
+        Sz = data.split('-')[2]
 	    x = Sx.split(':', 1)[1]
 	    y = Sy.split(':', 1)[1]
-            print(x,y)
+        z = Sy.split(':', 1)[1]
+        print(x,y,z)
 	    return int(x), int(y)
 
 
