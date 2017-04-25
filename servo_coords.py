@@ -7,7 +7,7 @@ import math
 
 SERVO_ERR = 3
 SERVO_ERR_ANGLE_X = -9
-SERVO_ERR_ANGLE_Y = -21
+SERVO_ERR_ANGLE_Y = -38
 
 GPIO_SERVO_X = 2
 GPIO_SERVO_Y = 3
@@ -71,7 +71,7 @@ def coordToAngle(x,y):
 
     #angleY = (coordY/float(CENTER_Y))*VIDEO_ANGLE_Y
 
-    return angleX, angleY
+    return angleX, -1*angleY
 
 
 def receiveCoords():
@@ -99,8 +99,8 @@ coordY = 0
 if len(sys.argv)>2:
     coordX = int(sys.argv[1])
     coordY = int(sys.argv[2])
-    # coordToAngle(coordX, coordY)
-    # sys.exit(1)
+    #print coordToAngle(coordX, coordY)
+    #sys.exit(1)
 
 pwm_X = GPIO.PWM(GPIO_SERVO_X, 100)
 pwm_Y = GPIO.PWM(GPIO_SERVO_Y, 100)
@@ -116,7 +116,7 @@ while True:
 
     try:
 
-        coordX, coordY = receiveCoords()
+        #coordX, coordY = receiveCoords()
 
         print(coordX,coordY)
 
